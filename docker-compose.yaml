@@ -21,19 +21,33 @@ services:
       ADMIN_PASSWORD: "secret"
     restart: unless-stopped
 
-  mongo.simagix.com:
+  mongo-gssapi.simagix.com:
     image: simagix/mongo-kerberos
-    hostname: mongo.simagix.com
+    hostname: mongo-gssapi.simagix.com
     depends_on:
       - kerberos.simagix.com
       - ldap.simagix.com
-    ports:
-      - 27017:27017
     environment:
       REALM: SIMAGIX.COM
       ADMIN_USER: "admin"
       ADMIN_PASSWORD: "secret"
-    restart: unless-stopped
+    command: /entrypoint.sh GSSAPI
+
+  mongo-plain.simagix.com:
+    image: simagix/mongo-kerberos
+    hostname: mongo-plain.simagix.com
+    depends_on:
+      - mongo-gssapi.simagix.com
+    environment:
+      REALM: SIMAGIX.COM
+    command: /entrypoint.sh PLAIN
+
+  mongo-builtin.simagix.com:
+    image: simagix/mongo-kerberos
+    hostname: mongo-builtin.simagix.com
+    depends_on:
+      - mongo-gssapi.simagix.com
+    command: /entrypoint.sh
 networks:
   kerberos_net:
     driver: bridge
