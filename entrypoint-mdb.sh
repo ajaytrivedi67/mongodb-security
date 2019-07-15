@@ -33,6 +33,12 @@ auth_scram() {
     --eval 'db.runCommand({connectionStatus : 1})'
 }
 
+auth_x509() {
+  mongo "mongodb://CN=ken.chen%40simagix.com,OU=Users,O=Simagix,L=Atlanta,ST=Georgia,C=US:xxx@mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
+    --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem \
+    --eval 'db.runCommand({connectionStatus : 1})'
+}
+
 # test LDAP
 auth_ldap() {
   # Use a connection string, %2f: / and %40: @
@@ -89,6 +95,7 @@ elif [ "$AUTH_MECHANISM" == "SCRAM" ]; then
   cp /mongo.simagix.com.pem /mongo.pem
   mongod -f /etc/mongod.conf
   auth_scram
+  auth_x509
 
 else
   sleep 5
@@ -97,6 +104,7 @@ else
   # kinit mdb@$REALM -kt $keytab
   auth_scram
   auth_ldap
+  auth_x509
 
 fi
 
