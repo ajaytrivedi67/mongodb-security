@@ -2,7 +2,7 @@
 # Copyright 2019 Kuei-chun Chen. All rights reserved.
 : ${REALM:=EXAMPLE.COM}
 : ${ADMIN_USER:=admin}
-: ${ADMIN_PASSWORD:=admin}
+: ${ADMIN_PASSWORD:=secret}
 
 AUTH_MECHANISM="$2"
 mkdir -p /var/log/mongodb /var/log/kerberos /repo
@@ -62,7 +62,7 @@ echo "TLS_REQCERT never" >> /etc/openldap/ldap.conf
 echo "TLS_CACERT /server.pem" >> /etc/openldap/ldap.conf
 cp /ldap.simagix.com.pem /server.pem
 
-pass=$ADMIN_PASSWORD
+pass="secret"
 keytab="/repo/mongodb.keytab"
 
 if [ "$AUTH_MECHANISM" == "GSSAPI" ]; then
@@ -99,9 +99,8 @@ elif [ "$AUTH_MECHANISM" == "SCRAM" ]; then
 
 else
   sleep 5
-  printf "%b" "addent -password -p mdb -k 1 -e aes256-cts\n$pass\nwrite_kt $keytab" | ktutil
+  printf "%b" "addent -password -p mongodb/test.simagix.com -k 1 -e aes256-cts\n$pass\naddent -password -p mdb -k 1 -e aes256-cts\n$pass\nwrite_kt $keytab" | ktutil
   klist -kt $keytab
-  # kinit mdb@$REALM -kt $keytab
   auth_scram
   auth_ldap
   auth_x509

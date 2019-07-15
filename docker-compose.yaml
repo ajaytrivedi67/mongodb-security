@@ -68,6 +68,8 @@ services:
       - mongo-plain
     environment:
       REALM: SIMAGIX.COM
+      ADMIN_USER: admin
+      ADMIN_PASSWORD: secret
     command: /entrypoint.sh test
 
 networks:
