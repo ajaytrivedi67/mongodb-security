@@ -2,52 +2,74 @@
 version: "3"
 
 services:
-  kerberos.simagix.com:
+  kerberos:
     image: simagix/kerberos
     hostname: kerberos.simagix.com
+    container_name: kerberos.simagix.com
     environment:
-      REALM: "SIMAGIX.COM"
-      DOMAIN_REALM: "kerberos.simagix.com"
-      ADMIN_USER: "admin"
-      ADMIN_PASSWORD: "secret"
+      REALM: SIMAGIX.COM
+      DOMAIN_REALM: kerberos.simagix.com
+      ADMIN_USER: admin
+      ADMIN_PASSWORD: secret
     volumes:
       - /tmp/kerberos:/var/log/kerberos
     restart: unless-stopped
 
-  ldap.simagix.com:
+  ldap:
     image: simagix/openldap
     hostname: ldap.simagix.com
+    container_name: ldap.simagix.com
     environment:
-      ADMIN_PASSWORD: "secret"
+      ADMIN_PASSWORD: secret
     restart: unless-stopped
 
-  mongo-gssapi.simagix.com:
+  mongo-gssapi:
     image: simagix/mongo-kerberos
     hostname: mongo-gssapi.simagix.com
+    container_name: mongo-gssapi.simagix.com
     depends_on:
-      - kerberos.simagix.com
-      - ldap.simagix.com
+      - kerberos
+      - ldap
     environment:
       REALM: SIMAGIX.COM
-      ADMIN_USER: "admin"
-      ADMIN_PASSWORD: "secret"
+      ADMIN_USER: admin
+      ADMIN_PASSWORD: secret
     command: /entrypoint.sh GSSAPI
+    restart: unless-stopped
 
-  mongo-plain.simagix.com:
+  mongo-plain:
     image: simagix/mongo-kerberos
     hostname: mongo-plain.simagix.com
+    container_name: mongo-plain.simagix.com
     depends_on:
-      - mongo-gssapi.simagix.com
+      - ldap
     environment:
       REALM: SIMAGIX.COM
     command: /entrypoint.sh PLAIN
+    restart: unless-stopped
 
-  mongo-builtin.simagix.com:
+  mongo:
     image: simagix/mongo-kerberos
-    hostname: mongo-builtin.simagix.com
+    hostname: mongo.simagix.com
+    container_name: mongo.simagix.com
     depends_on:
-      - mongo-gssapi.simagix.com
-    command: /entrypoint.sh
+      - ldap
+    command: /entrypoint.sh SCRAM
+    restart: unless-stopped
+
+  test:
+    image: simagix/mongo-kerberos
+    hostname: test.simagix.com
+    container_name: test.simagix.com
+    depends_on:
+      - ldap
+      - mongo
+      - mongo-gssapi
+      - mongo-plain
+    environment:
+      REALM: SIMAGIX.COM
+    command: /entrypoint.sh test
+
 networks:
-  kerberos_net:
+  security_net:
     driver: bridge

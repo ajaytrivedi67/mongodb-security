@@ -1,3 +1,5 @@
+subject=/C=US/ST=Georgia/L=Atlanta/O=Simagix/OU=Root/CN=ldap.simagix.com/emailAddress=admin@simagix.com
+issuer=/C=US/ST=Georgia/L=Atlanta/O=Simagix/OU=Root/CN=ldap.simagix.com/emailAddress=admin@simagix.com
 -----BEGIN CERTIFICATE-----
 MIIEDzCCAvegAwIBAgIJAJ4v6rhK4nZTMA0GCSqGSIb3DQEBCwUAMIGPMQswCQYD
 VQQGEwJVUzEQMA4GA1UECAwHR2VvcmdpYTEQMA4GA1UEBwwHQXRsYW50YTEQMA4G
@@ -22,3 +24,4 @@ JzTy1oFqX/+PAj4S5KUCHiFoOz6EM1PbF9R1NGI5pCLMqDXMTywGtpnvS8YfXWBf
 XFTewB3X/ld8JVDhO3WTf4Mr93MamSM0RR+EPgOeQxhUiphABZvzTDk9AAF/FuYq
 a52Lak/2etfXUjGl60vA2NfjQ6WBY6tGj2FBkqRAP3EIWXA=
 -----END CERTIFICATE-----
+

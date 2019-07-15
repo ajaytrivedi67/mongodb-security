@@ -13,7 +13,7 @@ This project demos how MongoDB Enterprise server uses Kerberos for authenticatio
 - Authentication Mechanism
   - GSSAPI runs against mongo-gssapi.simagix.com
   - PLAIN runs against mongo-plain.simagix.com
-  - Default (SCRAM-SHA-1) runs against mongo-builtin.simagix.com
+  - Default (SCRAM-SHA-1) runs against mongo.simagix.com
 - Authorization runs against mongo-plain.simagix.com
 
 ## build
@@ -48,7 +48,7 @@ mongoldap --config /etc/mongod.conf --user mdb@SIMAGIX.COM --password secret
 SCRAM-SHA-1:
 
 ```
-mongo "mongodb://admin:secret@mongo-builtin.simagix.com/?authSource=admin" \
+mongo "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" \
   --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem
 ```
 
@@ -74,17 +74,17 @@ db.runCommand({connectionStatus : 1})
 ## x509 Certificates
 ### Certificate Creation
 ```
-create_certs.sh ldap.simagix.com mongo-builtin.simagix.com \
+create_certs.sh ldap.simagix.com mongo.simagix.com \
   mongo-gssapi.simagix.com mongo-plain.simagix.com
 
-certs/
+certs
 ├── ca.crt
 ├── ca.pem
 ├── client.pem
 ├── ldap.simagix.com.pem
-├── mongo-builtin.simagix.com.pem
 ├── mongo-gssapi.simagix.com.pem
-└── mongo-plain.simagix.com.pem
+├── mongo-plain.simagix.com.pem
+└── mongo.simagix.com.pem
 ```
 For additional certificates, use `certs/ca.pem` to sign.
 
