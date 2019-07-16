@@ -16,63 +16,74 @@ This project demos how MongoDB Enterprise server uses Kerberos for authenticatio
   - Default (SCRAM-SHA-1) runs against mongo.simagix.com
 - Authorization runs against mongo-plain.simagix.com
 
-## build
+## 1. Commands
+### 1.1. build
 ```
 docker build -t simagix/kerberos -f Dockerfile-krb .
 docker build -t simagix/openldap -f Dockerfile-ldap .
 docker build -t simagix/mongo-kerberos -f Dockerfile-mdb .
 ```
 
-## Startup
+### 1.2. startup
 ```
 docker-compose up
 ```
 
-## Shutdown
+### 1.3. shutdown
 ```
 docker-compose down
 ```
 
-## Test
-### Search LDAP
+### 1.4. ldapsearch
 ```
 ldapsearch -x cn=mdb -b dc=simagix,dc=local -H ldaps://ldap.simagix.com
 ```
 
-### Validate /etc/mongod.conf
+### 1.5. mongoldap
 ```
 mongoldap --config /etc/mongod.conf --user mdb@SIMAGIX.COM --password secret
 ```
 
-### Connection Test
-SCRAM-SHA-1:
+## 2. Security Playpen
+### 2.1. attach to the `test.simagix.com` container
 
+```
+docker exec -it test.simagix.com /bin/bash
+```
+
+### 2.2. SCRAM-SHA-1
 ```
 mongo "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" \
   --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem
 ```
 
-LDAP:
+### 2.3. MONGODB-X509
+```
+export login="CN=ken.chen%40simagix.com,OU=Users,O=Simagix,L=Atlanta,ST=Georgia,C=US"
+mongo "mongodb://$login:xxx@mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
+  --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem
+```
 
+### 2.4. PLAIN (LDAP)
 ```
 mongo "mongodb://mdb%40$REALM:secret@mongo-plain.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
   --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem
 ```
 
-Kerberos:
-
+### 2.5. GSSAPI (Kerberos)
 ```
+kinit mdb@SIMAGIX.COM -kt /repo/mongodb.keytab
 mongo "mongodb://mdb%40$REALM:xxx@mongo-gssapi.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
   --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem
 ```
 
-Check connection status:
+### 2.6 mongo connection status
 ```
 db.runCommand({connectionStatus : 1})
 ```
 
-## x509 Certificates
-### Certificate Creation
+## 3. Misc.
+### 3.1. certificates creation
 ```
 create_certs.sh ldap.simagix.com mongo.simagix.com \
   mongo-gssapi.simagix.com mongo-plain.simagix.com
@@ -86,11 +97,9 @@ certs
 ├── mongo-plain.simagix.com.pem
 └── mongo.simagix.com.pem
 ```
-For additional certificates, use `certs/ca.pem` to sign.
+For additional certificates, use  [create_certs.sh](https://github.com/simagix/mongodb-utils/blob/master/certificates/create_certs.sh) to sign with *certs/ca.pem*.
 
-[create_certs.sh](https://github.com/simagix/mongodb-utils/blob/master/certificates/create_certs.sh)
-
-### Enable LDAP TLS
+### 3.2. enable LDAP TLS
 Lines added to */etc/openldap/ldap.conf* on both ldap.simagix.com and mongo-gssapi.simagix.com.
 
 ```

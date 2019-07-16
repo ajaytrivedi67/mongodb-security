@@ -28,19 +28,22 @@ seed_data() {
 
 # test scram login
 auth_scram() {
+  echo "==> auth_scram"
   mongo --quiet "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" \
     --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }
 
 auth_x509() {
-  mongo "mongodb://CN=ken.chen%40simagix.com,OU=Users,O=Simagix,L=Atlanta,ST=Georgia,C=US:xxx@mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
+  echo "==> auth_x509"
+  mongo --quiet "mongodb://CN=ken.chen%40simagix.com,OU=Users,O=Simagix,L=Atlanta,ST=Georgia,C=US:xxx@mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
     --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }
 
 # test LDAP
 auth_ldap() {
+  echo "==> auth_ldap"
   # Use a connection string, %2f: / and %40: @
   # login is mdb@SIMAGIX.COM to comply with userToDNMapping, or we can add more rules to userToDNMapping
   mongo --quiet "mongodb://mdb%40$REALM:secret@mongo-plain.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
@@ -50,6 +53,7 @@ auth_ldap() {
 
 # test Kerberos
 auth_gssapi() {
+  echo "==> auth_gssapi"
   # Use a connection string, %2f: / and %40: @
   kinit mdb@$REALM -kt $keytab
   mongo --quiet "mongodb://mdb%40$REALM:xxx@mongo-gssapi.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
@@ -64,6 +68,7 @@ cp /ldap.simagix.com.pem /server.pem
 
 pass="secret"
 keytab="/repo/mongodb.keytab"
+rm -f $keytab
 
 if [ "$AUTH_MECHANISM" == "GSSAPI" ]; then
   seed_data
@@ -79,7 +84,7 @@ if [ "$AUTH_MECHANISM" == "GSSAPI" ]; then
   echo "setParameter:" >> /etc/mongod.conf
   echo " authenticationMechanisms: GSSAPI" >> /etc/mongod.conf
   env KRB5_KTNAME=$keytab mongod -f /etc/mongod.conf
-  auth_gssapi
+  #auth_gssapi
 
 elif [ "$AUTH_MECHANISM" == "PLAIN" ]; then
   seed_data
@@ -88,22 +93,26 @@ elif [ "$AUTH_MECHANISM" == "PLAIN" ]; then
   echo "setParameter:" >> /etc/mongod.conf
   echo " authenticationMechanisms: PLAIN" >> /etc/mongod.conf
   mongod -f /etc/mongod.conf
-  auth_ldap
+  #auth_ldap
 
 elif [ "$AUTH_MECHANISM" == "SCRAM" ]; then
   seed_data
   cp /mongo.simagix.com.pem /mongo.pem
   mongod -f /etc/mongod.conf
-  auth_scram
-  auth_x509
+  #auth_scram
+  #auth_x509
 
 else
   sleep 5
   printf "%b" "addent -password -p mongodb/test.simagix.com -k 1 -e aes256-cts\n$pass\naddent -password -p mdb -k 1 -e aes256-cts\n$pass\nwrite_kt $keytab" | ktutil
   klist -kt $keytab
+  # necessary for Kerberos reverse DNS lookup
+  echo "$(ping -c 1 kerberos.simagix.com|head -1|cut -d'(' -f2|cut -d')' -f1)  kerberos.simagix.com kerberos" >> /etc/hosts
+  echo "$(ping -c 1 mongo-gssapi.simagix.com|head -1|cut -d'(' -f2|cut -d')' -f1)  mongo-gssapi.simagix.com kerberos" >> /etc/hosts
   auth_scram
   auth_ldap
   auth_x509
+  auth_gssapi
 
 fi
 
