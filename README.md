@@ -85,6 +85,7 @@ db.runCommand({connectionStatus : 1})
 ## 3. Misc.
 ### 3.1. certificates creation
 ```
+source certs.env
 create_certs.sh ldap.simagix.com mongo.simagix.com \
   mongo-gssapi.simagix.com mongo-plain.simagix.com
 

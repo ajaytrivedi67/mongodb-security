@@ -11,9 +11,6 @@ services:
       DOMAIN_REALM: kerberos.simagix.com
       ADMIN_USER: admin
       ADMIN_PASSWORD: secret
-    volumes:
-      - /tmp/kerberos:/var/log/kerberos
-    restart: unless-stopped
 
   ldap:
     image: simagix/openldap
@@ -21,7 +18,6 @@ services:
     container_name: ldap.simagix.com
     environment:
       ADMIN_PASSWORD: secret
-    restart: unless-stopped
 
   mongo-gssapi:
     image: simagix/mongo-kerberos
@@ -35,7 +31,6 @@ services:
       ADMIN_USER: admin
       ADMIN_PASSWORD: secret
     command: /entrypoint.sh GSSAPI
-    restart: unless-stopped
 
   mongo-plain:
     image: simagix/mongo-kerberos
@@ -46,7 +41,6 @@ services:
     environment:
       REALM: SIMAGIX.COM
     command: /entrypoint.sh PLAIN
-    restart: unless-stopped
 
   mongo:
     image: simagix/mongo-kerberos
@@ -55,7 +49,6 @@ services:
     depends_on:
       - ldap
     command: /entrypoint.sh SCRAM
-    restart: unless-stopped
 
   test:
     image: simagix/mongo-kerberos
@@ -71,7 +64,3 @@ services:
       ADMIN_USER: admin
       ADMIN_PASSWORD: secret
     command: /entrypoint.sh test
-
-networks:
-  security_net:
-    driver: bridge
