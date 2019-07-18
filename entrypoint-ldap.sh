@@ -22,7 +22,7 @@ ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
 ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif
 ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
 ldapadd -x -w $ADMIN_PASSWORD -D "cn=ldapadm,dc=simagix,dc=local" -H ldapi:/// -f /base.ldif
-ldapadd -x -w $ADMIN_PASSWORD -D "cn=ldapadm,dc=simagix,dc=local" -H ldapi:/// -f /mdb.ldif
+ldapadd -x -w $ADMIN_PASSWORD -D "cn=ldapadm,dc=simagix,dc=local" -H ldapi:/// -f /users.ldif
 
 touch $LDAP_LOG
 tail -F $LDAP_LOG

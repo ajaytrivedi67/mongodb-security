@@ -1,0 +1,32 @@
+# Users
+dn: cn=admin,ou=Users,dc=simagix,dc=local
+objectclass: inetOrgPerson
+objectclass: person
+objectclass: organizationalPerson
+cn: admin
+sn: admin
+uid: admin
+userpassword: {SSHA}6sMGfDyVRTfgo35CgXngCRl7CIG6noP8
+# slappasswd -h {SSHA} -s secret
+
+dn: cn=mdb,ou=Users,dc=simagix,dc=local
+objectclass: inetOrgPerson
+objectclass: person
+objectclass: organizationalPerson
+cn: mdb
+sn: mdb
+uid: mdb
+userpassword: {SSHA}6sMGfDyVRTfgo35CgXngCRl7CIG6noP8
+# slappasswd -h {SSHA} -s secret
+
+# Groups
+dn: cn=DBAdmin,ou=Groups,dc=simagix,dc=local
+objectclass: groupofnames
+cn: DBAdmin
+member: cn=admin,ou=Users,dc=simagix,dc=local
+
+dn: cn=Reporting,ou=Groups,dc=simagix,dc=local
+objectclass: groupofnames
+cn: Reporting
+member: cn=admin,ou=Users,dc=simagix,dc=local
+member: cn=mdb,ou=Users,dc=simagix,dc=local

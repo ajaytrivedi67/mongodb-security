@@ -23,19 +23,25 @@ seed_data() {
     role: 'cn=DBAdmin,ou=Groups,dc=simagix,dc=local', \
     privileges: [], \
     roles: [ 'userAdminAnyDatabase', 'clusterAdmin', 'readWriteAnyDatabase', 'dbAdminAnyDatabase' ] })"
+
+  mongo --quiet mongodb://localhost/ --eval "db.getSisterDB('admin').createRole({ \
+    role: 'cn=Reporting,ou=Groups,dc=simagix,dc=local', \
+    privileges: [], \
+    roles: [ {role: 'readWrite', db: 'admin'} })"
+
   mongo --quiet 'mongodb://localhost/admin' --eval 'db.shutdownServer()'
 }
 
 # test scram login
 auth_scram() {
-  echo "==> auth_scram"
+  echo "==> SCRAM-SHA-1"
   mongo --quiet "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" \
     --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }
 
 auth_x509() {
-  echo "==> auth_x509"
+  echo "==> MONGODB-X509"
   mongo --quiet "mongodb://CN=ken.chen%40simagix.com,OU=Users,O=Simagix,L=Atlanta,ST=Georgia,C=US:xxx@mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
     --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
@@ -43,7 +49,7 @@ auth_x509() {
 
 # test LDAP
 auth_ldap() {
-  echo "==> auth_ldap"
+  echo "==> PLAIN"
   # Use a connection string, %2f: / and %40: @
   # login is mdb@SIMAGIX.COM to comply with userToDNMapping, or we can add more rules to userToDNMapping
   mongo --quiet "mongodb://mdb%40$REALM:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
@@ -53,7 +59,7 @@ auth_ldap() {
 
 # test Kerberos
 auth_gssapi() {
-  echo "==> auth_gssapi"
+  echo "==> GSSAPI"
   # Use a connection string, %2f: / and %40: @
   kinit mdb@$REALM -kt $keytab
   mongo --quiet "mongodb://mdb%40$REALM:xxx@mongo.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
