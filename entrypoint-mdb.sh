@@ -46,7 +46,7 @@ auth_ldap() {
   echo "==> auth_ldap"
   # Use a connection string, %2f: / and %40: @
   # login is mdb@SIMAGIX.COM to comply with userToDNMapping, or we can add more rules to userToDNMapping
-  mongo --quiet "mongodb://mdb%40$REALM:secret@mongo-plain.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
+  mongo --quiet "mongodb://mdb%40$REALM:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
     --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }
@@ -56,7 +56,7 @@ auth_gssapi() {
   echo "==> auth_gssapi"
   # Use a connection string, %2f: / and %40: @
   kinit mdb@$REALM -kt $keytab
-  mongo --quiet "mongodb://mdb%40$REALM:xxx@mongo-gssapi.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
+  mongo --quiet "mongodb://mdb%40$REALM:xxx@mongo.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
     --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }
@@ -70,50 +70,32 @@ pass="secret"
 keytab="/repo/mongodb.keytab"
 rm -f $keytab
 
-if [ "$AUTH_MECHANISM" == "GSSAPI" ]; then
+if [ "$AUTH_MECHANISM" == "server" ]; then
   seed_data
   # Create princials
   # principal for mongod
-  kadmin -r $REALM -p $ADMIN_USER/admin -w $ADMIN_PASSWORD addprinc -pw $pass mongodb/mongo-gssapi.simagix.com
+  kadmin -r $REALM -p $ADMIN_USER/admin -w $ADMIN_PASSWORD addprinc -pw $pass mongodb/mongo.simagix.com
   kadmin -r $REALM -p $ADMIN_USER/admin -w $ADMIN_PASSWORD addprinc -pw $pass mdb
-  printf "%b" "addent -password -p mongodb/mongo-gssapi.simagix.com -k 1 -e aes256-cts\n$pass\naddent -password -p mdb -k 1 -e aes256-cts\n$pass\nwrite_kt $keytab" | ktutil
+  printf "%b" "addent -password -p mongodb/mongo.simagix.com -k 1 -e aes256-cts\n$pass\naddent -password -p mdb -k 1 -e aes256-cts\n$pass\nwrite_kt $keytab" | ktutil
 
   # Start mongod with auth and GSSAPI
-  cp /mongo-gssapi.simagix.com.pem /mongo.pem
-  echo "# set parameters" >> /etc/mongod.conf
-  echo "setParameter:" >> /etc/mongod.conf
-  echo " authenticationMechanisms: GSSAPI" >> /etc/mongod.conf
   env KRB5_KTNAME=$keytab mongod -f /etc/mongod.conf
-  #auth_gssapi
 
-elif [ "$AUTH_MECHANISM" == "PLAIN" ]; then
-  seed_data
-  cp /mongo-plain.simagix.com.pem /mongo.pem
-  echo "# set parameters" >> /etc/mongod.conf
-  echo "setParameter:" >> /etc/mongod.conf
-  echo " authenticationMechanisms: PLAIN" >> /etc/mongod.conf
-  mongod -f /etc/mongod.conf
-  #auth_ldap
-
-elif [ "$AUTH_MECHANISM" == "SCRAM" ]; then
-  seed_data
-  cp /mongo.simagix.com.pem /mongo.pem
-  mongod -f /etc/mongod.conf
-  #auth_scram
-  #auth_x509
-
-else
+elif [ "$AUTH_MECHANISM" == "test" ]; then
+  echo_sleep 5
   sleep 5
   printf "%b" "addent -password -p mongodb/test.simagix.com -k 1 -e aes256-cts\n$pass\naddent -password -p mdb -k 1 -e aes256-cts\n$pass\nwrite_kt $keytab" | ktutil
   klist -kt $keytab
   # necessary for Kerberos reverse DNS lookup
   echo "$(ping -c 1 kerberos.simagix.com|head -1|cut -d'(' -f2|cut -d')' -f1)  kerberos.simagix.com kerberos" >> /etc/hosts
-  echo "$(ping -c 1 mongo-gssapi.simagix.com|head -1|cut -d'(' -f2|cut -d')' -f1)  mongo-gssapi.simagix.com kerberos" >> /etc/hosts
+  echo "$(ping -c 1 mongo.simagix.com|head -1|cut -d'(' -f2|cut -d')' -f1)  mongo.simagix.com kerberos" >> /etc/hosts
   auth_scram
   auth_ldap
   auth_x509
   auth_gssapi
 
+else
+  exit 1
 fi
 
 # keep the instance up

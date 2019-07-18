@@ -11,10 +11,11 @@ This project demos how MongoDB Enterprise server uses Kerberos for authenticatio
   - LDAP configurations
   - Transport encryption using x509 certificates
 - Authentication Mechanism
-  - GSSAPI runs against mongo-gssapi.simagix.com
-  - PLAIN runs against mongo-plain.simagix.com
-  - Default (SCRAM-SHA-1) runs against mongo.simagix.com
-- Authorization runs against mongo-plain.simagix.com
+  - SCRAM-SHA-1
+  - MONGODB-X509
+  - GSSAPI
+  - PLAIN
+- Authorization runs against ldap.simagix.com
 
 ## 1. Commands
 ### 1.1. build
@@ -66,14 +67,14 @@ mongo "mongodb://$login:xxx@mongo.simagix.com/?authMechanism=MONGODB-X509&authSo
 
 ### 2.4. PLAIN (LDAP)
 ```
-mongo "mongodb://mdb%40$REALM:secret@mongo-plain.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
+mongo "mongodb://mdb%40$REALM:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
   --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem
 ```
 
 ### 2.5. GSSAPI (Kerberos)
 ```
 kinit mdb@SIMAGIX.COM -kt /repo/mongodb.keytab
-mongo "mongodb://mdb%40$REALM:xxx@mongo-gssapi.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
+mongo "mongodb://mdb%40$REALM:xxx@mongo.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
   --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem
 ```
 
@@ -86,22 +87,19 @@ db.runCommand({connectionStatus : 1})
 ### 3.1. certificates creation
 ```
 source certs.env
-create_certs.sh ldap.simagix.com mongo.simagix.com \
-  mongo-gssapi.simagix.com mongo-plain.simagix.com
+create_certs.sh ldap.simagix.com mongo.simagix.com
 
 certs
 ├── ca.crt
 ├── ca.pem
 ├── client.pem
 ├── ldap.simagix.com.pem
-├── mongo-gssapi.simagix.com.pem
-├── mongo-plain.simagix.com.pem
 └── mongo.simagix.com.pem
 ```
 For additional certificates, use  [create_certs.sh](https://github.com/simagix/mongodb-utils/blob/master/certificates/create_certs.sh) to sign with *certs/ca.pem*.
 
 ### 3.2. enable LDAP TLS
-Lines added to */etc/openldap/ldap.conf* on both ldap.simagix.com and mongo-gssapi.simagix.com.
+Lines added to */etc/openldap/ldap.conf* on both ldap.simagix.com and mongo.simagix.com.
 
 ```
 TLS_CACERT /server.pem

@@ -4,7 +4,6 @@ RUN yum -y install openldap compat-openldap openldap-clients openldap-servers op
 
 ADD openldap/*.ldif /
 ADD certs/ldap.simagix.com.pem /server.pem
-ADD hosts /etc/hosts
 
 EXPOSE 389 636
 ADD entrypoint-ldap.sh /entrypoint.sh
