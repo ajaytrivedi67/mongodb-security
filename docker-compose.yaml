@@ -4,8 +4,7 @@ version: "3"
 services:
   kerberos:
     image: simagix/kerberos
-    hostname: kerberos.simagix.com
-    container_name: kerberos.simagix.com
+    hostname: kerberos
     environment:
       REALM: SIMAGIX.COM
       DOMAIN_REALM: kerberos.simagix.com
@@ -14,15 +13,13 @@ services:
 
   ldap:
     image: simagix/openldap
-    hostname: ldap.simagix.com
-    container_name: ldap.simagix.com
+    hostname: ldap
     environment:
       ADMIN_PASSWORD: secret
 
   mongo:
     image: simagix/mongo-kerberos
-    hostname: mongo.simagix.com
-    container_name: mongo.simagix.com
+    hostname: mongo
     depends_on:
       - kerberos
       - ldap
@@ -34,8 +31,7 @@ services:
 
   test:
     image: simagix/mongo-kerberos
-    hostname: test.simagix.com
-    container_name: test.simagix.com
+    hostname: test
     depends_on:
       - ldap
       - mongo

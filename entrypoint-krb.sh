@@ -5,6 +5,9 @@
 : ${ADMIN_USER:=admin}
 : ${ADMIN_PASSWORD:=admin}
 
+echo "127.0.0.1	localhost" > /etc/hosts
+echo "$(ping -c 1 kerberos|head -1|cut -d'(' -f2|cut -d')' -f1)  kerberos.simagix.com kerberos" >> /etc/hosts
+
 # Create database
 /usr/sbin/kdb5_util -P $MASTER_KEY -r $REALM create -s
 

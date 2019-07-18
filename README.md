@@ -46,10 +46,10 @@ mongoldap --config /etc/mongod.conf --user mdb@SIMAGIX.COM --password secret
 ```
 
 ## 2. Security Playpen
-### 2.1. attach to the `test.simagix.com` container
+### 2.1. attach to the `mongodb-security_test_1` container
 
 ```
-docker exec -it test.simagix.com /bin/bash
+docker exec -it mongodb-security_test_1 /bin/bash
 ```
 
 ### 2.2. SCRAM-SHA-1

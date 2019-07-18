@@ -27,7 +27,7 @@ seed_data() {
   mongo --quiet mongodb://localhost/ --eval "db.getSisterDB('admin').createRole({ \
     role: 'cn=Reporting,ou=Groups,dc=simagix,dc=local', \
     privileges: [], \
-    roles: [ {role: 'readWrite', db: 'admin'} })"
+    roles: [ {role: 'readWrite', db: 'admin'} ] })"
 
   mongo --quiet 'mongodb://localhost/admin' --eval 'db.shutdownServer()'
 }
@@ -71,6 +71,10 @@ auth_gssapi() {
 echo "TLS_REQCERT never" >> /etc/openldap/ldap.conf
 echo "TLS_CACERT /server.pem" >> /etc/openldap/ldap.conf
 cp /ldap.simagix.com.pem /server.pem
+echo "127.0.0.1	localhost" > /etc/hosts
+echo "$(ping -c 1 kerberos|head -1|cut -d'(' -f2|cut -d')' -f1)  kerberos.simagix.com kerberos" >> /etc/hosts
+echo "$(ping -c 1 ldap|head -1|cut -d'(' -f2|cut -d')' -f1)  ldap.simagix.com ldap" >> /etc/hosts
+echo "$(ping -c 1 mongo|head -1|cut -d'(' -f2|cut -d')' -f1)  mongo.simagix.com mongo" >> /etc/hosts
 
 pass="secret"
 keytab="/repo/mongodb.keytab"
@@ -93,8 +97,6 @@ elif [ "$AUTH_MECHANISM" == "test" ]; then
   printf "%b" "addent -password -p mongodb/test.simagix.com -k 1 -e aes256-cts\n$pass\naddent -password -p mdb -k 1 -e aes256-cts\n$pass\nwrite_kt $keytab" | ktutil
   klist -kt $keytab
   # necessary for Kerberos reverse DNS lookup
-  echo "$(ping -c 1 kerberos.simagix.com|head -1|cut -d'(' -f2|cut -d')' -f1)  kerberos.simagix.com kerberos" >> /etc/hosts
-  echo "$(ping -c 1 mongo.simagix.com|head -1|cut -d'(' -f2|cut -d')' -f1)  mongo.simagix.com kerberos" >> /etc/hosts
   auth_scram
   auth_ldap
   auth_x509

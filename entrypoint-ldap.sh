@@ -5,6 +5,9 @@
 # Enable TLS
 echo "TLS_REQCERT never" >> /etc/openldap/ldap.conf
 echo "TLS_CACERT /server.pem" >> /etc/openldap/ldap.conf
+echo "127.0.0.1	localhost" > /etc/hosts
+echo "$(ping -c 1 kerberos|head -1|cut -d'(' -f2|cut -d')' -f1)  kerberos.simagix.com kerberos" >> /etc/hosts
+echo "$(ping -c 1 ldap|head -1|cut -d'(' -f2|cut -d')' -f1)  ldap.simagix.com ldap" >> /etc/hosts
 
 # Start slapd
 /usr/sbin/slapd -u ldap -h "ldapi:/// ldaps://ldap.simagix.com"
