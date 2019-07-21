@@ -15,14 +15,10 @@ seed_data() {
     pwd: 'secret', \
     roles: [ 'root' ]})"
 
-  mongo --quiet mongodb://localhost/ --eval "db.getSisterDB('\$external').createUser({ \
-    user: 'mdb@${REALM}', \
-    roles: [ { role: 'readWrite', db: 'admin' } ]})"
-
   mongo --quiet mongodb://localhost/ --eval "db.getSisterDB('admin').createRole({ \
     role: 'cn=DBAdmin,ou=Groups,dc=simagix,dc=local', \
     privileges: [], \
-    roles: [ 'userAdminAnyDatabase', 'clusterAdmin', 'readWriteAnyDatabase', 'dbAdminAnyDatabase' ] })"
+    roles: [ 'root' ] })"
 
   mongo --quiet mongodb://localhost/ --eval "db.getSisterDB('admin').createRole({ \
     role: 'cn=Reporting,ou=Groups,dc=simagix,dc=local', \
@@ -50,9 +46,8 @@ auth_x509() {
 # test LDAP
 auth_ldap() {
   echo "==> PLAIN"
-  # Use a connection string, %2f: / and %40: @
-  # login is mdb@SIMAGIX.COM to comply with userToDNMapping, or we can add more rules to userToDNMapping
-  mongo --quiet "mongodb://mdb%40$REALM:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
+  # mdb user exists in $external database
+  mongo --quiet "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
     --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }

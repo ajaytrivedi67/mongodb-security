@@ -67,7 +67,7 @@ mongo "mongodb://$login:xxx@mongo.simagix.com/?authMechanism=MONGODB-X509&authSo
 
 ### 2.4. PLAIN (LDAP)
 ```
-mongo "mongodb://mdb%40$REALM:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
+mongo "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
   --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem
 ```
 
