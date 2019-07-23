@@ -75,7 +75,7 @@ mongo "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$
 ```
 kinit mdb@SIMAGIX.COM -kt /repo/mongodb.keytab
 mongo "mongodb://mdb%40$REALM:xxx@mongo.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
-  --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem
+  --ssl --sslCAFile /ca.pem --sslPEMKeyFile /client.pem
 ```
 
 ### 2.6 mongo connection status
@@ -90,13 +90,13 @@ source certs.env
 create_certs.sh ldap.simagix.com mongo.simagix.com
 
 certs
-├── ca.crt
 ├── ca.pem
+├── certs.env
 ├── client.pem
 ├── ldap.simagix.com.pem
 └── mongo.simagix.com.pem
 ```
-For additional certificates, use  [create_certs.sh](https://github.com/simagix/mongodb-utils/blob/master/certificates/create_certs.sh) to sign with *certs/ca.pem*.
+For additional certificates, use [create_certs.sh](https://github.com/simagix/mongo-x509) to sign using *master-certs.pem*.
 
 ### 3.2. enable LDAP TLS
 Lines added to */etc/openldap/ldap.conf* on both ldap.simagix.com and mongo.simagix.com.
