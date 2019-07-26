@@ -24,6 +24,11 @@ chown ldap:ldap /var/lib/ldap/*
 ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
 ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif
 ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
+
+ldapadd -Q -Y EXTERNAL -H ldapi:/// -f /memberof_config.ldif
+ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /refint1.ldif
+ldapadd -Q -Y EXTERNAL -H ldapi:/// -f /refint2.ldif
+
 ldapadd -x -w $ADMIN_PASSWORD -D "cn=ldapadm,dc=simagix,dc=local" -H ldapi:/// -f /base.ldif
 ldapadd -x -w $ADMIN_PASSWORD -D "cn=ldapadm,dc=simagix,dc=local" -H ldapi:/// -f /users.ldif
 
