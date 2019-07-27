@@ -1,8 +1,8 @@
 FROM centos:7
-MAINTAINER Ken Chen <simagix@gmail.com>
+MAINTAINER Ken Chen <ken.chen@simagix.com>
 RUN yum install -y krb5-server krb5-libs krb5-auth-dialog krb5-workstation
-ADD krb5.conf /etc/krb5.conf
+ADD kerberos/krb5.conf /etc/krb5.conf
 
 EXPOSE 88 749
-ADD entrypoint-krb.sh /entrypoint.sh
+ADD kerberos/entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

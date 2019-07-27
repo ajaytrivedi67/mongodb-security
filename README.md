@@ -20,9 +20,7 @@ This project demos how MongoDB Enterprise server uses Kerberos for authenticatio
 ## 1. Commands
 ### 1.1. build
 ```
-docker build -t simagix/kerberos -f Dockerfile-krb .
-docker build -t simagix/openldap -f Dockerfile-ldap .
-docker build -t simagix/mongo-kerberos -f Dockerfile-mdb .
+./build.sh
 ```
 
 ### 1.2. startup
