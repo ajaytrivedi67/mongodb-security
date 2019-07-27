@@ -68,6 +68,10 @@ if [ "$AUTH_MECHANISM" == "server" ]; then
   kadmin -r $REALM -p $ADMIN_USER/admin -w $ADMIN_PASSWORD addprinc -pw $pass mdb
   printf "%b" "addent -password -p mongodb/mongo.simagix.com -k 1 -e aes256-cts\n$pass\naddent -password -p mdb -k 1 -e aes256-cts\n$pass\nwrite_kt $keytab" | ktutil
 
+  # validate installation
+  echo;echo "# mongoldap -f /etc/mongod.conf --user admin --password secret"
+  mongoldap -f /etc/mongod.conf --user admin --password secret
+
   # Start mongod with auth and GSSAPI
   env KRB5_KTNAME=$keytab mongod -f /etc/mongod.conf
 

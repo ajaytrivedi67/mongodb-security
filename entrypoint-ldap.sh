@@ -25,12 +25,19 @@ ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/cosine.ldif
 ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/nis.ldif
 ldapadd -Y EXTERNAL -H ldapi:/// -f /etc/openldap/schema/inetorgperson.ldif
 
+# enable memberOf
 ldapadd -Q -Y EXTERNAL -H ldapi:/// -f /memberof_config.ldif
-ldapmodify -Q -Y EXTERNAL -H ldapi:/// -f /refint1.ldif
-ldapadd -Q -Y EXTERNAL -H ldapi:/// -f /refint2.ldif
+ldapadd -Q -Y EXTERNAL -H ldapi:/// -f /refint.ldif
 
+# Add users and group
 ldapadd -x -w $ADMIN_PASSWORD -D "cn=ldapadm,dc=simagix,dc=local" -H ldapi:/// -f /base.ldif
 ldapadd -x -w $ADMIN_PASSWORD -D "cn=ldapadm,dc=simagix,dc=local" -H ldapi:/// -f /users.ldif
+
+# validate configurations
+echo "# ldapsearch -x -LLL -H ldapi:/// -b cn=admin,ou=users,dc=simagix,dc=local"
+ldapsearch -x -LLL -H ldapi:/// -b cn=admin,ou=users,dc=simagix,dc=local
+echo "# ldapsearch -x -LLL -H ldapi:/// -b cn=admin,ou=users,dc=simagix,dc=local memberOf"
+ldapsearch -x -LLL -H ldapi:/// -b cn=admin,ou=users,dc=simagix,dc=local memberOf
 
 touch $LDAP_LOG
 tail -F $LDAP_LOG
