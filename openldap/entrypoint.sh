@@ -14,8 +14,9 @@ echo "$(ping -c 1 ldap|head -1|cut -d'(' -f2|cut -d')' -f1)  ldap.simagix.com ld
 LDAP_LOG=/tmp/ldap.log
 
 olcRootPW=$(slappasswd -h {SSHA} -s $ADMIN_PASSWORD)
-echo "olcRootPW: ${olcRootPW}" >> /db.ldif
-ldapmodify -Y EXTERNAL -H ldapi:/// -f /db.ldif
+cp /db.ldif /hdb.ldif
+echo "olcRootPW: ${olcRootPW}" >> /hdb.ldif
+ldapmodify -Y EXTERNAL -H ldapi:/// -f /hdb.ldif
 ldapmodify -Y EXTERNAL -H ldapi:/// -f /monitor.ldif
 
 # Set up LDAP database
