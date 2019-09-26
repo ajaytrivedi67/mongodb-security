@@ -4,6 +4,9 @@
 # Run as root or using sudo
 
 yum -y install openldap compat-openldap openldap-clients openldap-servers openldap-servers-sql openldap-devel
+systemctl status slapd
+systemctl start slapd
+systemctl enable slapd
 ADMIN_PASSWORD=secret
 olcRootPW=$(slappasswd -h {SSHA} -s $ADMIN_PASSWORD)
 cp db.ldif hdb.ldif
