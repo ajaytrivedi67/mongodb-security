@@ -53,20 +53,20 @@ docker exec -it mongodb-security_test_1 /bin/bash
 ### 2.2. SCRAM-SHA-1
 ```
 mongo "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" \
-  --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem
+  --ssl --sslCAFile /ca.pem --sslPEMKeyFile /client.pem
 ```
 
 ### 2.3. MONGODB-X509
 ```
 export login="CN=ken.chen%40simagix.com,OU=Users,O=Simagix,L=Atlanta,ST=Georgia,C=US"
 mongo "mongodb://$login:xxx@mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
-  --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem
+  --ssl --sslCAFile /ca.pem --sslPEMKeyFile /client.pem
 ```
 
 ### 2.4. PLAIN (LDAP)
 ```
 mongo "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
-  --ssl --sslCAFile /ca.crt --sslPEMKeyFile /client.pem
+  --ssl --sslCAFile /ca.pem --sslPEMKeyFile /client.pem
 ```
 
 ### 2.5. GSSAPI (Kerberos)
