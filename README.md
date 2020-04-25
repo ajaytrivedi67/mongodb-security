@@ -11,11 +11,14 @@ This project demos how MongoDB Enterprise server uses Kerberos for authenticatio
   - LDAP configurations
   - Transport encryption using x509 certificates
 - Authentication Mechanism
-  - SCRAM-SHA-1
+  - SCRAM-SHA-256
   - MONGODB-X509
   - GSSAPI
   - PLAIN
 - Authorization runs against ldap.simagix.com
+
+## History
+- 04/25/2020: updated with MongoDB v4.2
 
 ## 1. Commands
 ### 1.1. build
@@ -50,30 +53,30 @@ mongoldap --config /etc/mongod.conf --user mdb@SIMAGIX.COM --password secret
 docker exec -it mongodb-security_test_1 /bin/bash
 ```
 
-### 2.2. SCRAM-SHA-1
+### 2.2. SCRAM-SHA-256
 ```
 mongo "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" \
-  --ssl --sslCAFile /ca.pem --sslPEMKeyFile /client.pem
+  --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
 ```
 
 ### 2.3. MONGODB-X509
 ```
 export login="CN=ken.chen%40simagix.com,OU=Users,O=Simagix,L=Atlanta,ST=Georgia,C=US"
 mongo "mongodb://$login:xxx@mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
-  --ssl --sslCAFile /ca.pem --sslPEMKeyFile /client.pem
+  --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
 ```
 
 ### 2.4. PLAIN (LDAP)
 ```
 mongo "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
-  --ssl --sslCAFile /ca.pem --sslPEMKeyFile /client.pem
+  --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
 ```
 
 ### 2.5. GSSAPI (Kerberos)
 ```
 kinit mdb@SIMAGIX.COM -kt /repo/mongodb.keytab
 mongo "mongodb://mdb%40$REALM:xxx@mongo.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
-  --ssl --sslCAFile /ca.pem --sslPEMKeyFile /client.pem
+  --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
 ```
 
 ### 2.6 mongo connection status
@@ -94,7 +97,8 @@ certs
 ├── ldap.simagix.com.pem
 └── mongo.simagix.com.pem
 ```
-For additional certificates, use [create_certs.sh](https://github.com/simagix/mongo-x509) to sign using *master-certs.pem*.
+For additional certificates, use [create_certs.sh](https://github.com/simagix/mongo-x509/blob/master/create_certs.sh)
+to sign using *master-certs.pem*.
 
 ### 3.2. enable LDAP TLS
 Lines added to */etc/openldap/ldap.conf* on both ldap.simagix.com and mongo.simagix.com.

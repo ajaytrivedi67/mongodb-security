@@ -14,16 +14,16 @@ seed_data() {
 
 # test scram login
 auth_scram() {
-  echo "==> SCRAM-SHA-1"
+  echo "==> SCRAM-SHA-256"
   mongo --quiet "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" \
-    --ssl --sslCAFile /ca.pem --sslPEMKeyFile /client.pem \
+    --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }
 
 auth_x509() {
   echo "==> MONGODB-X509"
   mongo --quiet "mongodb://CN=ken.chen%40simagix.com,OU=Users,O=Simagix,L=Atlanta,ST=Georgia,C=US:xxx@mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
-    --ssl --sslCAFile /ca.pem --sslPEMKeyFile /client.pem \
+    --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }
 
@@ -32,7 +32,7 @@ auth_ldap() {
   echo "==> PLAIN"
   # mdb user exists in $external database
   mongo --quiet "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
-    --ssl --sslCAFile /ca.pem --sslPEMKeyFile /client.pem \
+    --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }
 
@@ -42,7 +42,7 @@ auth_gssapi() {
   # Use a connection string, %2f: / and %40: @
   kinit mdb@$REALM -kt $keytab
   mongo --quiet "mongodb://mdb%40$REALM:xxx@mongo.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
-    --ssl --sslCAFile /ca.pem --sslPEMKeyFile /client.pem \
+    --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }
 
