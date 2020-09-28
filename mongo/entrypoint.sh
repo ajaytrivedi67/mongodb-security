@@ -69,11 +69,13 @@ if [ "$AUTH_MECHANISM" == "server" ]; then
   printf "%b" "addent -password -p mongodb/mongo.simagix.com -k 1 -e aes256-cts\n$pass\naddent -password -p mdb -k 1 -e aes256-cts\n$pass\nwrite_kt $keytab" | ktutil
 
   # validate installation
-  echo;echo "# mongoldap -f /etc/mongod.conf --user admin --password secret"
-  mongoldap -f /etc/mongod.conf --user admin --password secret
+  echo;echo "# mongoldap -f /etc/mongod.conf --user admin --password $pass"
+  mongoldap -f /etc/mongod.conf --user admin --password $pass
 
   # Start mongod with auth and GSSAPI
-  env KRB5_KTNAME=$keytab mongod -f /etc/mongod.conf
+  echo "$pass" > /secret
+  chmod 600 /etc/mongod.conf
+  env KRB5_KTNAME=$keytab mongod -f /etc/mongod.conf --configExpand "exec"
 
 elif [ "$AUTH_MECHANISM" == "test" ]; then
   sleep 5
