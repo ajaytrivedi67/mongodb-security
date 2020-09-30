@@ -131,13 +131,18 @@ TLS_REQCERT never # self-signed certs
 Attach to *mongo* container and execute the command:
 
 ```bash
-% docker exec -it mongodb-security_mongo_1 bash
-# mongoldap -f /etc/mongod.conf --user admin --password secret
+docker exec -it mongodb-security_mongo_1 bash
+```
+
+Test with `mongoldap` command:
+
+```bash
+mongoldap -f /etc/mongod.conf --user admin --password secret
 ```
 
 ### 4.1 Correct Configuration
 
-```bash
+```text
 Running MongoDB LDAP authorization validation checks...
 Version: 4.2.9
 
@@ -170,7 +175,7 @@ Executing query against LDAP server...
 
 Incorrect password in the *security.ldap.bin.queryUser* and/or *security.ldap.bin.queryPassword*.
 
-```bash
+```text
 Running MongoDB LDAP authorization validation checks...
 Version: 4.2.9
 
@@ -179,19 +184,18 @@ Checking that an LDAP server has been specified...
 
 Connecting to LDAP server...
 2020-09-29T20:34:31.844+0000 W  ACCESS   [main] LDAP library does not advertise support for thread safety. All access will be serialized and connection pooling will be disabled. Link mongod against libldap_r to enable concurrent use of LDAP.
-2020-09-29T20:34:31.920+0000 E  ACCESS   [main] OperationFailed: LDAP operation <ldap_sasl_bind_s>, failed to bind to LDAP server at default\". (49/Invalid credentials): No error could be retrieved from the LDAP server.. Bind parameters were: {BindDN: cn=ldapadm,dc=simagix,dc=local, authenticationType: simple}
+2020-09-29T20:34:31.920+0000 E  ACCESS   [main] OperationFailed: LDAP operation <ldap_sasl_bind_s>, failed to bind to LDAP server at default. (49/Invalid credentials): No error could be retrieved from the LDAP server.. Bind parameters were: {BindDN: cn=ldapadm,dc=simagix,dc=local, authenticationType: simple}
 [FAIL] Could not connect to any of the specified LDAP servers
   * Error: OperationFailed: LDAP bind failed with error: Invalid credentials
   * The server may be down, or 'security.ldap.servers' or 'security.ldap.transportSecurity' may be incorrectly configured.
   * Alternatively the server may not allow anonymous access to the RootDSE.
-``` server may not allow anonymous access to the RootDSE.
 ```
 
 ### 4.3 userToDNMapping Failed on Nonexisting User
 
 The rule expects a user *cn=admin,ou=Admin,ou=Users,dc=simagix,dc=local*, but the user in the LDAP server is *cn=admin,ou=Users,dc=simagix,dc=local*.  The extra *ou=Admin* fails the inquiry.
 
-```bash
+```text
 Running MongoDB LDAP authorization validation checks...
 Version: 4.2.9
 
@@ -214,7 +218,7 @@ Attempting to authenticate against the LDAP server...
 
 Under *security.ldap.userToDNMapping*, expect to swap a value of *ldapQuery* ({0}) with a matched *match* ("(.+)")
 
-```bash
+```text
 Running MongoDB LDAP authorization validation checks...
 Version: 4.2.9
 
@@ -237,7 +241,7 @@ Attempting to authenticate against the LDAP server...
 
 Incorrect password in the *security.ldap.bin.queryUser* and/or *security.ldap.bin.queryPassword*.
 
-```bash
+```text
 Running MongoDB LDAP authorization validation checks...
 Version: 4.2.9
 
