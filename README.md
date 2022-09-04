@@ -57,43 +57,87 @@ mongoldap --config /etc/mongod.conf --user mdb@SIMAGIX.COM --password secret
 
 ## 2 Security Playpen
 
-### 2.1 attach to the `mongodb-security_test_1` container
+### 2.1 Connect from Test Container
+
+First, attach to the `mongodb-security_test_1` container.
 
 ```bash
 docker exec -it mongodb-security_test_1 /bin/bash
 ```
 
-### 2.2 SCRAM-SHA-256
+#### 2.1.1 SCRAM-SHA-256
 
 ```bash
 mongosh "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" \
   --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
 ```
 
-### 2.3 MONGODB-X509
+#### 2.1.2 MONGODB-X509
 
 ```bash
-export login="CN=ken.chen%40simagix.com,OU=Users,O=Simagix,L=Atlanta,ST=Georgia,C=US"
 mongosh "mongodb://mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
   --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
 ```
 
-### 2.4 PLAIN (LDAP)
+#### 2.1.3 PLAIN (LDAP)
 
 ```bash
 mongosh "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
   --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
 ```
 
-### 2.5 GSSAPI (Kerberos)
+#### 2.1.4 GSSAPI (Kerberos)
 
 ```bash
-kinit mdb@SIMAGIX.COM -kt /repo/mongodb.keytab
+kinit mdb@SIMAGIX.COM -kt /repo/mongodb.krb
 mongosh "mongodb://mdb%40$REALM:xxx@mongo.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
   --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
 ```
 
-### 2.6 mongo connection status
+### 2.2 Connect from Anywhere
+
+The following methods don't attach to the test container.  If connecting from a remote server,
+replace the *localhost* with the hostname where containers are running.
+
+#### 2.2.1 SCRAM-SHA-256
+
+```bash
+mongosh "mongodb://admin:secret@localhost:37017/?authSource=admin" \
+  --tls --tlsCAFile certs/ca.pem --tlsCertificateKeyFile certs/client.pem
+```
+
+#### 2.2.2 MONGODB-X509
+
+```bash
+mongosh "mongodb://localhost:37017/?authMechanism=MONGODB-X509&authSource=\$external" \
+  --tls --tlsCAFile certs/ca.pem --tlsCertificateKeyFile certs/client.pem
+```
+
+#### 2.2.3 PLAIN (LDAP)
+
+```bash
+mongosh "mongodb://ldap:secret@localhost:37017/?authMechanism=PLAIN&authSource=\$external" \
+  --tls --tlsCAFile certs/ca.pem --tlsCertificateKeyFile certs/client.pem
+```
+
+#### 2.2.4 GSSAPI (Kerberos)
+
+This is an experiment.  On macOS, Kerberos is running when file sharing is enabled and thus can't
+forward Kerberos port 88.  Thus, the `kinit` command fails.
+
+```bash
+export REALM="SIMAGIX.COM"
+export pass="secret"
+export keytab="mongodb.krb"
+rm -f $keytab
+ktutil --keytab=$keytab add -p mdb@$REALM -w secret -e aes256-cts-hmac-sha1-96 -V 1
+ktutil --keytab=$keytab list
+kinit --keytab=$keytab -f mdb@$REALM
+mongosh "mongodb://mdb%40$REALM:xxx@localhost:37017/?authMechanism=GSSAPI&authSource=\$external" \
+  --tls --tlsCAFile certs/ca.pem --tlsCertificateKeyFile certs/client.pem
+```
+
+### 2.3 mongo connection status
 
 ```bash
 db.runCommand({connectionStatus : 1})

@@ -14,12 +14,16 @@ services:
   ldap:
     image: simagix/openldap
     hostname: ldap
+    ports:
+      - 636:636
     environment:
       ADMIN_PASSWORD: secret
 
   mongo:
     image: simagix/mongo-kerberos
     hostname: mongo
+    ports:
+      - 37017:27017
     depends_on:
       - kerberos
       - ldap

@@ -22,7 +22,7 @@ auth_scram() {
 
 auth_x509() {
   echo "==> MONGODB-X509"
-  mongosh --quiet "mongodb://CN=ken.chen%40simagix.com,OU=Users,O=Simagix,L=Atlanta,ST=Georgia,C=US:xxx@mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
+  mongosh --quiet "mongodb://mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
     --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }
@@ -57,7 +57,7 @@ echo "$(ping -c 1 ldap|head -1|cut -d'(' -f2|cut -d')' -f1)  ldap.simagix.com ld
 echo "$(ping -c 1 mongo|head -1|cut -d'(' -f2|cut -d')' -f1)  mongo.simagix.com mongo" >> /etc/hosts
 
 pass="secret"
-keytab="/repo/mongodb.keytab"
+keytab="/repo/mongodb.krb"
 rm -f $keytab
 
 if [ "$AUTH_MECHANISM" == "server" ]; then
