@@ -1,5 +1,5 @@
 FROM centos:7
-MAINTAINER Ken Chen <ken.chen@simagix.com>
+LABEL Ken Chen <ken.chen@simagix.com>
 RUN yum -y install openldap compat-openldap openldap-clients openldap-servers openldap-servers-sql openldap-devel
 
 ADD openldap/*.ldif /

@@ -1,9 +1,9 @@
 #! /bin/bash
-# Copyright 2019 Kuei-chun Chen. All rights reserved.
+# Copyright 2019-present Kuei-chun Chen. All rights reserved.
 
 docker-compose down
 
-export ver="4.2"
+export ver="5.0"
 docker build -t simagix/kerberos -f kerberos/Dockerfile .
 docker build -t simagix/openldap -f openldap/Dockerfile .
 docker build -t simagix/mongo-kerberos:latest -t simagix/mongo-kerberos:${ver} -f mongo/Dockerfile .

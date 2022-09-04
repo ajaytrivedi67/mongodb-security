@@ -1,5 +1,5 @@
 #! /bin/bash
-# Copyright 2019 Kuei-chun Chen. All rights reserved.
+# Copyright 2019-present Kuei-chun Chen. All rights reserved.
 # Kerberos on Centos installation
 # Run as root or using sudo
 yum install -y krb5-server krb5-libs krb5-auth-dialog krb5-workstation

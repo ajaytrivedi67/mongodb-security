@@ -158,7 +158,7 @@ env KRB5_KTNAME=/root/application.keytab mongod --auth \
 
 ### Client
 ```
-mongo --host ip-172-31-52-45.ec2.internal \
+mongosh --host ip-172-31-52-45.ec2.internal \
     --authenticationMechanism=GSSAPI \
     --authenticationDatabase='$external' \
     --username "application/reporting@EXAMPLE.COM"

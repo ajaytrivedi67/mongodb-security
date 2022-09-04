@@ -1,5 +1,5 @@
 #! /bin/bash
-# Copyright 2019 Kuei-chun Chen. All rights reserved.
+# Copyright 2019-present Kuei-chun Chen. All rights reserved.
 : ${ADMIN_PASSWORD:=admin}
 
 # Enable TLS

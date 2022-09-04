@@ -65,7 +65,7 @@ docker exec -it mongodb-security_test_1 /bin/bash
 ### 2.2 SCRAM-SHA-256
 
 ```bash
-mongo "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" \
+mongosh "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" \
   --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
 ```
 
@@ -73,14 +73,14 @@ mongo "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" \
 
 ```bash
 export login="CN=ken.chen%40simagix.com,OU=Users,O=Simagix,L=Atlanta,ST=Georgia,C=US"
-mongo "mongodb://$login:xxx@mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
+mongosh "mongodb://mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
   --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
 ```
 
 ### 2.4 PLAIN (LDAP)
 
 ```bash
-mongo "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
+mongosh "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
   --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
 ```
 
@@ -88,7 +88,7 @@ mongo "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$
 
 ```bash
 kinit mdb@SIMAGIX.COM -kt /repo/mongodb.keytab
-mongo "mongodb://mdb%40$REALM:xxx@mongo.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
+mongosh "mongodb://mdb%40$REALM:xxx@mongo.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
   --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
 ```
 

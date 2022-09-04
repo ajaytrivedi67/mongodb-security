@@ -1,5 +1,5 @@
 #! /bin/bash
-# Copyright 2019 Kuei-chun Chen. All rights reserved.
+# Copyright 2019-present Kuei-chun Chen. All rights reserved.
 : ${REALM:=EXAMPLE.COM}
 : ${ADMIN_USER:=admin}
 : ${ADMIN_PASSWORD:=secret}
@@ -9,20 +9,20 @@ mkdir -p /var/log/mongodb /var/log/kerberos /repo
 
 seed_data() {
   mongod --dbpath /data/db --logpath /var/log/mongodb/mongod.log --bind_ip_all --fork
-  mongo 'mongodb://localhost/' < /admin.js
+  mongosh 'mongodb://localhost/' < /admin.js
 }
 
 # test scram login
 auth_scram() {
   echo "==> SCRAM-SHA-256"
-  mongo --quiet "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" \
+  mongosh --quiet "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" \
     --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }
 
 auth_x509() {
   echo "==> MONGODB-X509"
-  mongo --quiet "mongodb://CN=ken.chen%40simagix.com,OU=Users,O=Simagix,L=Atlanta,ST=Georgia,C=US:xxx@mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
+  mongosh --quiet "mongodb://CN=ken.chen%40simagix.com,OU=Users,O=Simagix,L=Atlanta,ST=Georgia,C=US:xxx@mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
     --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }
@@ -31,7 +31,7 @@ auth_x509() {
 auth_ldap() {
   echo "==> PLAIN"
   # mdb user exists in $external database
-  mongo --quiet "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
+  mongosh --quiet "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
     --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }
@@ -41,7 +41,7 @@ auth_gssapi() {
   echo "==> GSSAPI"
   # Use a connection string, %2f: / and %40: @
   kinit mdb@$REALM -kt $keytab
-  mongo --quiet "mongodb://mdb%40$REALM:xxx@mongo.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
+  mongosh --quiet "mongodb://mdb%40$REALM:xxx@mongo.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
     --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem \
     --eval 'db.runCommand({connectionStatus : 1})'
 }
