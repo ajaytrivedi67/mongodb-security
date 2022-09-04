@@ -57,67 +57,62 @@ mongoldap --config /etc/mongod.conf --user mdb@SIMAGIX.COM --password secret
 
 ## 2 Security Playpen
 
-### 2.1 Connect from Test Container
+### 2.1 Connect from client Container
 
-First, attach to the `mongodb-security_test_1` container.
+First, attach to the `mongodb-security_client_1` container.
 
 ```bash
-docker exec -it mongodb-security_test_1 /bin/bash
+docker exec -it mongodb-security_client_1 /bin/bash
 ```
 
 #### 2.1.1 SCRAM-SHA-256
 
 ```bash
-mongosh "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" \
-  --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
+mongosh "mongodb://admin:secret@mongo.simagix.com/?authSource=admin" --tls --tlsCAFile /ca.pem
 ```
 
 #### 2.1.2 MONGODB-X509
 
 ```bash
 mongosh "mongodb://mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$external" \
-  --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
+    --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
 ```
 
 #### 2.1.3 PLAIN (LDAP)
 
 ```bash
-mongosh "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" \
-  --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
+mongosh "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" --tls --tlsCAFile /ca.pem
 ```
 
 #### 2.1.4 GSSAPI (Kerberos)
 
 ```bash
-kinit mdb@SIMAGIX.COM -kt /repo/mongodb.krb
-mongosh "mongodb://mdb%40$REALM:xxx@mongo.simagix.com/?authMechanism=GSSAPI&authSource=\$external" \
-  --tls --tlsCAFile /ca.pem --tlsCertificateKeyFile /client.pem
+kinit mdb@SIMAGIX.COM -kt /mongodb.krb
+mongosh "mongodb://mdb%40$REALM:xxx@mongo.simagix.com/?authMechanism=GSSAPI&authSource=\$external" --tls --tlsCAFile /ca.pem
 ```
 
 ### 2.2 Connect from Anywhere
 
-The following methods don't attach to the test container.  If connecting from a remote server,
+The following methods don't attach to the *client* container.  If connecting from a remote server,
 replace the *localhost* with the hostname where containers are running.
 
 #### 2.2.1 SCRAM-SHA-256
 
 ```bash
-mongosh "mongodb://admin:secret@localhost:37017/?authSource=admin" \
-  --tls --tlsCAFile certs/ca.pem --tlsCertificateKeyFile certs/client.pem
+mongosh "mongodb://admin:secret@localhost:37017/?authSource=admin" --tls --tlsCAFile certs/ca.pem
 ```
 
 #### 2.2.2 MONGODB-X509
 
 ```bash
 mongosh "mongodb://localhost:37017/?authMechanism=MONGODB-X509&authSource=\$external" \
-  --tls --tlsCAFile certs/ca.pem --tlsCertificateKeyFile certs/client.pem
+    --tls --tlsCAFile certs/ca.pem  --tlsCertificateKeyFile certs/client.pem
 ```
 
 #### 2.2.3 PLAIN (LDAP)
 
 ```bash
-mongosh "mongodb://ldap:secret@localhost:37017/?authMechanism=PLAIN&authSource=\$external" \
-  --tls --tlsCAFile certs/ca.pem --tlsCertificateKeyFile certs/client.pem
+mongosh "mongodb://ldap:secret@localhost:37017/?authMechanism=PLAIN&authSource=\$external" --tls --tlsCAFile certs/ca.pem
 ```
 
 #### 2.2.4 GSSAPI (Kerberos)

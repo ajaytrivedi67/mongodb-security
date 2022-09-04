@@ -20,7 +20,7 @@ services:
       ADMIN_PASSWORD: secret
 
   mongo:
-    image: simagix/mongo-kerberos
+    image: simagix/mongo-security
     hostname: mongo
     ports:
       - 37017:27017
@@ -33,9 +33,9 @@ services:
       ADMIN_PASSWORD: secret
     command: /entrypoint.sh server
 
-  test:
-    image: simagix/mongo-kerberos
-    hostname: test
+  client:
+    image: simagix/mongo-security
+    hostname: client
     depends_on:
       - ldap
       - mongo
@@ -43,4 +43,4 @@ services:
       REALM: SIMAGIX.COM
       ADMIN_USER: admin
       ADMIN_PASSWORD: secret
-    command: /entrypoint.sh test
+    command: /entrypoint.sh client
