@@ -20,6 +20,7 @@ This project demos how MongoDB Enterprise server uses Kerberos for authenticatio
 
 ## History
 
+- 09/03/2022: updated with MongoDB v5.0
 - 04/25/2020: updated with MongoDB v4.2
 
 ## 1 Commands
@@ -140,17 +141,19 @@ Test with `mongoldap` command:
 mongoldap -f /etc/mongod.conf --user admin --password secret
 ```
 
+Note that `mongoldap` hasn't supported __exec yet.
+
 ### 4.1 Correct Configuration
 
 ```text
 Running MongoDB LDAP authorization validation checks...
-Version: 4.2.9
+Version: 5.0.11
 
 Checking that an LDAP server has been specified...
 [OK] LDAP server(s) provided in configuration
 
 Connecting to LDAP server...
-2020-09-29T20:27:46.961+0000 W  ACCESS   [main] LDAP library does not advertise support for thread safety. All access will be serialized and connection pooling will be disabled. Link mongod against libldap_r to enable concurrent use of LDAP.
+{"t":{"$date":"2022-09-04T00:44:00.797Z"},"s":"W",  "c":"ACCESS",   "id":24052,   "ctx":"thread1","msg":"LDAP library does not advertise support for thread safety. All access will be serialized and connection pooling will be disabled. Link mongod against libldap_r to enable concurrent use of LDAP."}
 [OK] Connected to LDAP server
 
 Parsing MongoDB to LDAP DN mappings...
@@ -168,8 +171,11 @@ Parsing LDAP query template...
 Executing query against LDAP server...
 [OK] Successfully acquired the following roles on the 'admin' database:
 
-  * cn=Reporting,ou=Groups,dc=simagix,dc=local
+	* cn=DBAdmin,ou=Groups,dc=simagix,dc=local
+	* cn=Reporting,ou=Groups,dc=simagix,dc=local
 ```
+
+**Note: below are from previous tests**
 
 ### 4.2 Authentication Failed
 
