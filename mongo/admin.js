@@ -9,5 +9,5 @@ db.getSiblingDB('admin').createRole({
 db.getSiblingDB('admin').createRole({
   role: 'cn=Reporting,ou=Groups,dc=simagix,dc=local',
   privileges: [],
-  roles: [ {role: 'readWriteAnyDatabase', db: 'admin'} ] });
+  roles: [ {role: 'readAnyDatabase', db: 'admin'} ] });
 db.getSiblingDB('admin').shutdownServer();

@@ -74,7 +74,7 @@ if [ "$AUTH_MECHANISM" == "server" ]; then
   chmod 600 /etc/mongod.conf
   env KRB5_KTNAME=$keytab mongod -f /etc/mongod.conf --configExpand "exec"
 elif [ "$AUTH_MECHANISM" == "client" ]; then
-  sleep 5
+  sleep 8
   printf "%b" "addent -password -p mongodb/client.simagix.com -k 1 -e aes256-cts\n$pass\naddent -password -p mdb -k 1 -e aes256-cts\n$pass\nwrite_kt $keytab" | ktutil
   klist -kt $keytab
   auth_scram

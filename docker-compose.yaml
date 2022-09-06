@@ -37,6 +37,7 @@ services:
     image: simagix/mongo-security
     hostname: client
     depends_on:
+      - kerberos
       - ldap
       - mongo
     environment:

@@ -34,7 +34,7 @@ This project demos how MongoDB Enterprise server uses Kerberos for authenticatio
 ### 1.2 startup
 
 ```bash
-docker-compose up
+docker-compose up -d
 ```
 
 ### 1.3 shutdown
@@ -46,23 +46,23 @@ docker-compose down
 ### 1.4 ldapsearch
 
 ```bash
-ldapsearch -x cn=mdb -b dc=simagix,dc=local -H ldaps://ldap.simagix.com
+ldapsearch -x cn=ldap -b dc=simagix,dc=local -H ldaps://ldap.simagix.com
 ```
 
 ### 1.5 mongoldap
 
 ```bash
-mongoldap --config /etc/mongod.conf --user mdb@SIMAGIX.COM --password secret
+mongoldap --config /etc/mongod.conf --user ldap@SIMAGIX.COM --password secret
 ```
 
 ## 2 Security Playpen
 
 ### 2.1 Connect from client Container
 
-First, attach to the `mongodb-security_client_1` container.
+First, attach to the `mongodb-security-client-1` container.
 
 ```bash
-docker exec -it mongodb-security_client_1 /bin/bash
+docker exec -it mongodb-security-client-1 /bin/bash
 ```
 
 #### 2.1.1 SCRAM-SHA-256
@@ -81,7 +81,7 @@ mongosh "mongodb://mongo.simagix.com/?authMechanism=MONGODB-X509&authSource=\$ex
 #### 2.1.3 PLAIN (LDAP)
 
 ```bash
-mongosh "mongodb://mdb:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" --tls --tlsCAFile /ca.pem
+mongosh "mongodb://ldap:secret@mongo.simagix.com/?authMechanism=PLAIN&authSource=\$external" --tls --tlsCAFile /ca.pem
 ```
 
 #### 2.1.4 GSSAPI (Kerberos)
@@ -171,7 +171,7 @@ TLS_REQCERT never # self-signed certs
 Attach to *mongo* container and execute the command:
 
 ```bash
-docker exec -it mongodb-security_mongo_1 bash
+docker exec -it mongodb-security-mongo-1 bash
 ```
 
 Test with `mongoldap` command:
