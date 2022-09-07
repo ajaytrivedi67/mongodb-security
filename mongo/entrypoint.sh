@@ -8,7 +8,8 @@ AUTH_MECHANISM="$2"
 mkdir -p /var/log/mongodb /var/log/kerberos
 
 seed_data() {
-  mongod --dbpath /data/db --logpath /var/log/mongodb/mongod.log --bind_ip_all --fork
+  mongod --dbpath /data/db --logpath /var/log/mongodb/mongod.log \
+      --enableEncryption --encryptionKeyFile /mongodb-keyfile --bind_ip_all --fork
   mongosh 'mongodb://localhost/' < /admin.js
 }
 
@@ -74,7 +75,7 @@ if [ "$AUTH_MECHANISM" == "server" ]; then
   chmod 600 /etc/mongod.conf
   env KRB5_KTNAME=$keytab mongod -f /etc/mongod.conf --configExpand "exec"
 elif [ "$AUTH_MECHANISM" == "client" ]; then
-  sleep 8
+  sleep 10
   printf "%b" "addent -password -p mongodb/client.simagix.com -k 1 -e aes256-cts\n$pass\naddent -password -p mdb -k 1 -e aes256-cts\n$pass\nwrite_kt $keytab" | ktutil
   klist -kt $keytab
   auth_scram
@@ -87,4 +88,4 @@ fi
 
 # keep the instance up
 touch /var/log/mongodb/mongod.log
-tail -1f /var/log/mongodb/mongod.log
+tail -1f /var/log/mongodb/mongod.log | grep -v '"I"'

@@ -10,6 +10,7 @@ EXPOSE 27017
 
 ADD certs/*.pem /
 ADD mongo/admin.js /
+ADD mongo/mongodb-keyfile /
 ADD mongo/mongod.conf /etc/mongod.conf
 ADD mongo/entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
