@@ -11,6 +11,10 @@ services:
       ADMIN_USER: admin
       ADMIN_PASSWORD: secret
 
+  kmip:
+    image: simagix/pykmip
+    hostname: kmip
+
   ldap:
     image: simagix/openldap
     hostname: ldap
@@ -26,6 +30,7 @@ services:
       - 37017:27017
     depends_on:
       - kerberos
+      - kmip
       - ldap
     environment:
       REALM: SIMAGIX.COM

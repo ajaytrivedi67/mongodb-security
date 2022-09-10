@@ -8,9 +8,9 @@ AUTH_MECHANISM="$2"
 mkdir -p /var/log/mongodb /var/log/kerberos
 
 seed_data() {
-  mongod --dbpath /data/db --logpath /var/log/mongodb/mongod.log \
-      --enableEncryption --encryptionKeyFile /mongodb-keyfile --bind_ip_all --fork
-  mongosh 'mongodb://localhost/' < /admin.js
+  # create an admin user using localhost exception
+  mongosh --quiet "mongodb://localhost/" --tls --tlsCAFile /ca.pem < /admin_user.js
+  mongosh --quiet "mongodb://admin:secret@localhost/" --tls --tlsCAFile /ca.pem < /admin.js
 }
 
 # test scram login
@@ -51,6 +51,7 @@ cp /ldap.simagix.com.pem /server.pem
 echo "127.0.0.1	localhost" > /etc/hosts
 # necessary for Kerberos reverse DNS lookup
 echo "$(ping -c 1 kerberos|head -1|cut -d'(' -f2|cut -d')' -f1)  kerberos.simagix.com kerberos" >> /etc/hosts
+echo "$(ping -c 1 kmip|head -1|cut -d'(' -f2|cut -d')' -f1)  kmip.simagix.com kmip" >> /etc/hosts
 echo "$(ping -c 1 ldap|head -1|cut -d'(' -f2|cut -d')' -f1)  ldap.simagix.com ldap" >> /etc/hosts
 echo "$(ping -c 1 mongo|head -1|cut -d'(' -f2|cut -d')' -f1)  mongo.simagix.com mongo" >> /etc/hosts
 
@@ -59,7 +60,6 @@ keytab="/mongodb.krb"
 rm -f $keytab
 
 if [ "$AUTH_MECHANISM" == "server" ]; then
-  seed_data
   # Create princials
   # principal for mongod
   kadmin -r $REALM -p $ADMIN_USER/admin -w $ADMIN_PASSWORD addprinc -pw $pass mongodb/mongo.simagix.com
@@ -73,7 +73,9 @@ if [ "$AUTH_MECHANISM" == "server" ]; then
   # Start mongod with auth and GSSAPI
   echo "$pass" > /secret
   chmod 600 /etc/mongod.conf
+  sleep 5
   env KRB5_KTNAME=$keytab mongod -f /etc/mongod.conf --configExpand "exec"
+  seed_data
 elif [ "$AUTH_MECHANISM" == "client" ]; then
   sleep 10
   printf "%b" "addent -password -p mongodb/client.simagix.com -k 1 -e aes256-cts\n$pass\naddent -password -p mdb -k 1 -e aes256-cts\n$pass\nwrite_kt $keytab" | ktutil

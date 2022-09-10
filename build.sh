@@ -3,9 +3,10 @@
 
 docker-compose down
 
-export ver="5.0"
+ver=$(cat version)
 docker build -t simagix/kerberos -f kerberos/Dockerfile .
 docker build -t simagix/openldap -f openldap/Dockerfile .
 docker build -t simagix/mongo-security:latest -t simagix/mongo-security:${ver} -f mongo/Dockerfile .
+docker build -t simagix/pykmip -f pykmip/Dockerfile .
 
 docker rmi -f $(docker images -f "dangling=true" -q)
