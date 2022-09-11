@@ -8,8 +8,17 @@ RUN yum -y install mongodb-enterprise && \
     mkdir -p /data/db && chown -R mongod:mongod /data/db
 EXPOSE 27017
 
-ADD certs/*.pem /
+ADD certs/ca.pem /
+ADD certs/mongo.simagix.com.pem /
+ADD certs/ldap.simagix.com.pem /server.pem
+
+ADD certs/kmip-client.pem /kmip-client.pem
+ADD certs/root_certificate.pem /kmip-ca.pem
+# ADD certs/client.pem /kmip-client.pem
+# ADD certs/ca.pem /kmip-ca.pem
+
 ADD mongo/admin.js /
+ADD mongo/admin_user.js /
 ADD mongo/mongodb-keyfile /
 ADD mongo/mongod.conf /etc/mongod.conf
 ADD mongo/entrypoint.sh /entrypoint.sh
