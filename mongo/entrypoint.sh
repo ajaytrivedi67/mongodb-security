@@ -47,7 +47,6 @@ auth_gssapi() {
 # Enable TLS
 echo "TLS_REQCERT never" >> /etc/openldap/ldap.conf
 echo "TLS_CACERT /server.pem" >> /etc/openldap/ldap.conf
-cp /ldap.simagix.com.pem /server.pem
 echo "127.0.0.1	localhost" > /etc/hosts
 # necessary for Kerberos reverse DNS lookup
 echo "$(ping -c 1 kerberos|head -1|cut -d'(' -f2|cut -d')' -f1)  kerberos.simagix.com kerberos" >> /etc/hosts
