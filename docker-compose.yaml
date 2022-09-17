@@ -3,7 +3,7 @@ version: "3"
 
 services:
   kerberos:
-    image: simagix/kerberos:1.1
+    image: simagix/kerberos
     hostname: kerberos
     environment:
       REALM: SIMAGIX.COM
@@ -11,42 +11,20 @@ services:
       ADMIN_USER: admin
       ADMIN_PASSWORD: secret
 
-  kmip:
-    image: simagix/pykmip:1.1
-    hostname: kmip
-
   ldap:
-    image: simagix/openldap:1.1
+    image: simagix/openldap
     hostname: ldap
-    ports:
-      - 636:636
     environment:
       ADMIN_PASSWORD: secret
 
   mongo:
-    image: simagix/mongo-security:1.1
+    image: simagix/mongo-security:labs
     hostname: mongo
-    ports:
-      - 37017:27017
     depends_on:
       - kerberos
-      - kmip
       - ldap
     environment:
       REALM: SIMAGIX.COM
       ADMIN_USER: admin
       ADMIN_PASSWORD: secret
-    command: /entrypoint.sh server
-
-  client:
-    image: simagix/mongo-security:1.1
-    hostname: client
-    depends_on:
-      - kerberos
-      - ldap
-      - mongo
-    environment:
-      REALM: SIMAGIX.COM
-      ADMIN_USER: admin
-      ADMIN_PASSWORD: secret
-    command: /entrypoint.sh client
+    command: /entrypoint.sh labs
